@@ -1,5 +1,11 @@
 # Reference materials for `sw-ibm1130-forth`
 
+> Saga decisions affecting how this crate uses the references are
+> locked in [`gen-isa/docs/forth-on-1130-decisions.md`](https://github.com/sw-vibe-coding/gen-isa/blob/main/docs/forth-on-1130-decisions.md):
+> ITC threading, ASCII source, 28-primitive kernel, syntactic-
+> retargeting-only translation, XR3 reserved as LIBF base.
+
+
 Two-tier policy:
 
 - **`reference/`** (gitignored). Local-only working copies of
