@@ -1,0 +1,19 @@
+[package]
+name = "sw-ibm1130-forth"
+version = "0.1.0"
+edition = "2024"
+description = "FORTH frontend targeting the IBM 1130 (recreating the language on its native machine)"
+license = "MIT"
+
+[dependencies]
+sw-isa-core = { path = "/Users/mike/github/sw-langtools/sw-isa-core" }
+sw-target-core = { path = "/Users/mike/github/sw-langtools/sw-target-core" }
+sw-tir = { path = "/Users/mike/github/sw-langtools/sw-tir" }
+sw-codegen-core = { path = "/Users/mike/github/sw-langtools/sw-codegen-core" }
+sw-ibm1130-isa = { path = "../sw-ibm1130-isa" }
+sw-ibm1130-target = { path = "../sw-ibm1130-target" }
+sw-ibm1130-codegen = { path = "../sw-ibm1130-codegen" }
+sw-ibm1130-asm = { path = "../sw-ibm1130-asm" }
+
+[dev-dependencies]
+sw-ibm1130-emulator = { path = "../sw-ibm1130-emulator" }

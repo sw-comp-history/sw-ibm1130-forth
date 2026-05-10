@@ -1,0 +1,16 @@
+# Build output
+target/
+Cargo.lock
+
+# Reference materials -- downloaded locally for development but NOT
+# tracked in this repo. Each contains content authored by others;
+# we link to the upstream sources from docs/references.md instead
+# of redistributing here. See that doc for clone instructions.
+reference/
+
+# Editor / OS detritus
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
