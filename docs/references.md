@@ -1,13 +1,27 @@
 # Reference materials for `sw-ibm1130-forth`
 
-This repo does **not** redistribute upstream reference materials.
-We link to the canonical sources here and use a local
-`reference/` directory (gitignored at the repo root) for working
-copies during development. Contributors clone the references
-themselves; nothing in `reference/` is part of this repo.
+Two-tier policy:
 
-This avoids licensing/attribution complications around carrying
-other people's content in our git history.
+- **`reference/`** (gitignored). Local-only working copies of
+  upstream content we **read** but do not **redistribute**. Used
+  for code-reuse references where redistribution adds nothing
+  (e.g. MIT-licensed projects we don't need to vendor).
+  Contributors clone the references themselves.
+- **`historical/`** (tracked). Translations / adaptations of
+  historical content that we **do** redistribute, with full
+  attribution and a per-subdirectory `NOTICE` file. Used where
+  shipping the artifact in this repo is the point of the
+  exercise (e.g. demonstrating Moore's 1968 FORTH literally
+  running on our toolchain).
+
+The 1968 FORTH source falls under both: the upstream copy at
+`monsonite/1968-FORTH` lives in `reference/1968-FORTH/`
+(gitignored, optional, for direct reading and cross-check), and
+a translated-into-our-asm-syntax copy lives in
+`historical/forth68/` (tracked, redistributed under Moore's
+public-posting permission with attribution to Moore and
+monsonite). See `historical/forth68/NOTICE` for the redistribution
+provenance.
 
 ## How to populate `reference/`
 
@@ -32,13 +46,14 @@ ln -s ~/github/sw-embed/sw-cor24-forth reference/sw-cor24-forth
 
 ## Sources
 
-### 1. The original 1968 FORTH (load-bearing)
+### 1. The original 1968 FORTH (load-bearing; both tiers)
 
-- **Repo:** https://github.com/monsonite/1968-FORTH
-- **License:** Charles H. Moore granted permission for public
-  posting in May 2020. See the upstream repo for the canonical
-  attribution; we treat it as read-only reference, not as code we
-  can vendor and re-license.
+- **Upstream repo:** https://github.com/monsonite/1968-FORTH
+- **Permission:** Charles H. Moore granted public-posting
+  permission in May 2020. The upstream copy operates under that
+  permission; our `historical/forth68/` redistribution operates
+  under the same permission with attribution to Moore and to
+  monsonite. See `historical/forth68/NOTICE`.
 - **Contents (per upstream README):**
   - `FORTH68asm.txt` -- 645-line 1130 assembly source for the
     kernel; 28 primitives + dictionary structure.
@@ -49,11 +64,19 @@ ln -s ~/github/sw-embed/sw-cor24-forth reference/sw-cor24-forth
 - **Provenance:** recovered from Bob Flanders' email circa 2011;
   attracted IBM 1130 restoration interest in March 2018; published
   with Moore's permission in May 2020.
-- **Use in this crate:** structural reference for our kernel's
-  primitives, register allocation (XR1=W, XR2=DSP per Moore's
-  scheme; we differ on XR3 -- see `gen-isa/docs/forth-on-1130-plan.md`
-  Sec 4 for why we keep XR3 as the LIBF base), and the FORTH-level
-  bootstrap sequence. **Do not copy code verbatim into this repo.**
+- **Use in this crate (two tiers):**
+  - `reference/1968-FORTH/` (gitignored, optional). Direct
+    upstream copy for cross-checking. Clone with
+    `git clone https://github.com/monsonite/1968-FORTH reference/1968-FORTH`.
+  - `historical/forth68/` (tracked, redistributed). Translation
+    into our `sw-ibm1130-asm` syntax so anyone running our demos
+    has the kernel without needing to populate `reference/`.
+    Translation lands in the `forth-on-1130` saga; until then
+    the directory has only `README.md`, `NOTICE`, and a
+    `TRANSLATION-LOG.md` placeholder.
+- **Key constraint:** algorithm preserved; only syntactic
+  retargeting allowed in the translation. Every transformation
+  is logged in `historical/forth68/TRANSLATION-LOG.md`.
 
 ### 2. `ibm-1130-rs` (CPU and assembler reference)
 

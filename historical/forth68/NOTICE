@@ -1,0 +1,66 @@
+================================================================
+sw-ibm1130-forth historical/forth68/  -- attribution + provenance
+================================================================
+
+This directory contains a translation of Charles H. Moore's
+1968 FORTH for the IBM 1130, redistributed under the
+public-posting permission Moore granted in May 2020.
+
+Original work
+-------------
+    "FORTH" -- the first implementation of the Forth language.
+    Author : Charles H. Moore.
+    Year   : 1968.
+    Place  : Mohasco Industries, Amsterdam, NY.
+    Target : IBM 1130 with 2250 graphic display.
+    Form   : 645-line IBM 1130 assembly source ("FORTH68asm.txt"
+             in the upstream copy) plus a 235-line FORTH-level
+             listing dumped from the 1130 disk
+             ("FORTH68lst.txt"), originally created as a deck of
+             punched cards.
+
+Redistribution permission
+-------------------------
+    Charles H. Moore granted permission for public posting of
+    the recovered source in May 2020. The publicly-available
+    copy at https://github.com/monsonite/1968-FORTH is hosted
+    under that permission. This directory's redistribution
+    operates under the same permission, with attribution to
+    Moore (the original author) and to monsonite/1968-FORTH (the
+    upstream copy we translated from).
+
+Upstream copy translated from
+-----------------------------
+    Repository : https://github.com/monsonite/1968-FORTH
+    Revision   : (recorded in TRANSLATION-LOG.md when this
+                  directory is populated by the forth-on-1130
+                  saga)
+
+Translation
+-----------
+    Translator : Michael A Wright, 2026.
+    Scope      : syntactic retargeting (column layout, directive
+                 names, EBCDIC literal handling, BSC mask
+                 encoding) so the source compiles under our
+                 sw-ibm1130-asm and runs under our
+                 sw-ibm1130-emulator. Algorithm, primitive set,
+                 and identifier choices are unchanged from
+                 Moore's 1968 source.
+    Log        : every transformation is documented in
+                 TRANSLATION-LOG.md.
+
+If Moore or his estate ever objects to this redistribution, we
+will retire this directory and revert to the reference-only
+model documented in docs/references.md.
+
+Other upstream identifiers (for cross-checking)
+-----------------------------------------------
+    Carl Claunch's analysis : "notes on FORTX assem code.pdf" in
+                              the upstream repo.
+    Notes file              : "FORTH-68_notes.txt" upstream.
+
+The MIT License governing the rest of this repo (see ../../LICENSE)
+applies to **our** translation work, not to Moore's underlying
+algorithm or source. Treat the translated kernel as a derivative
+of Moore's original under his public-posting permission, with our
+syntactic-retargeting layer as our contribution.

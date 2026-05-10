@@ -27,10 +27,18 @@ Sibling crates already shipped:
 
 ## Reference materials
 
-This repo does **not** redistribute upstream reference materials.
-See [`docs/references.md`](docs/references.md) for sources and
-clone instructions. The `reference/` directory at the repo root
-is gitignored; you populate it yourself.
+Two-tier policy (see [`docs/references.md`](docs/references.md)
+for the full version):
+
+- **`reference/`** (gitignored). Local-only copies of upstream
+  content we read but do not redistribute. Contributors clone
+  the references themselves.
+- **`historical/`** (tracked). Translations / adaptations we
+  redistribute with attribution and a per-subdirectory `NOTICE`.
+  The headline entry is `historical/forth68/`, which holds a
+  translation of Charles H. Moore's 1968 FORTH (under his
+  May-2020 public-posting permission) so the demo runs out of a
+  fresh `git clone`.
 
 ## Sibling layout
 
