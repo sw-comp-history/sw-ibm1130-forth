@@ -84,6 +84,18 @@ XR3); the translation log records each rewrite.
 
 ## 4. Branching idioms (and the BSC-mask call-site count)
 
+> **Status (2026-05-12, saga step 3 closed):** the BSC-mask gap
+> described in this section is **resolved**. `sw-ibm1130-isa`'s
+> `Instruction::Long` now carries a 7-bit `mask` field;
+> `sw-ibm1130-asm` populates it for `BSC L target, mask` /
+> `BSI L target, mask` syntax; `sw-ibm1130-emulator` reads it with
+> Moore's authoritative bit assignments (E=0x04, P=0x08, N=0x10,
+> Z=0x20, C=0x40). The demos (conditions, loops, strings, hello)
+> have been rewritten to use direct masked branches instead of
+> the skip-and-jump workaround. The notes below are kept for
+> historical context describing what was wrong before the fix.
+
+
 The asm uses standard 1130 mnemonics for conditional branches:
 
 | Mnemonic | Meaning                          | Encodes as |
