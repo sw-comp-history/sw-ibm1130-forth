@@ -322,11 +322,11 @@ START:  LDX  L 2, STACK_PLUS1 ; XR2 = stack base + 1
         LDX  L 3, FORTH_RTN
         STX  L 3, STACK_PLUS1
         LDX  L 3, ACCEP
-        STX  L 3, A_MINUS_2
+        STX  L 3, A-2
         LDX  L 3, BCD_END     ; was BCD+63; resolved below
-        STX  L 3, A_MINUS_1
+        STX  L 3, A-1
         LDX  L 3, SAVE0
-        STX  L 3, A_MINUS_4
+        STX  L 3, A-4
         LDX  L 3, /19FF
         STX  L 3, IC
         LDX  L 3, /0268       ; was /10EE; Moore CVC change
@@ -580,12 +580,9 @@ STACK:  BSS     16            ; data stack (XR2 base)
 STACK_PLUS1:
         DC      0             ; addressable from STACK+1 by symbol
 
-A_MINUS_2:
-        DC      0             ; resolved at link time to A-2; STUB
-A_MINUS_1:
-        DC      0             ; A-1; STUB
-A_MINUS_4:
-        DC      0             ; A-4; STUB
+; A-2 / A-1 / A-4 are workspace slots in the W1 block above; no
+; separate definitions needed (the operand expressions 'A-2'
+; etc. resolve against the W1 block).
 
 R:      DC      0             ; return-stack pointer
 INTST:  BSS     32            ; interpreter state save area
