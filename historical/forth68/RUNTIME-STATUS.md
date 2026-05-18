@@ -1,5 +1,21 @@
 # Runtime status: Moore's 1968 kernel on `sw-ibm1130-emulator`
 
+> Saga step 8 update (2026-05-18): kernel runs for 1000 steps
+> without a decode error and IAR migrates from the START block
+> into the primitive area (so FORTH_RTN, NEXT, BSI/BSC dispatches
+> are all working). New `tests/kernel_parses.rs` adds an
+> exploratory input-injection scaffold that writes EBCDIC bytes
+> into a known SECT-buffer location and points the kernel's char
+> cursor at it; after 250 steps with injection, workspace[0] is
+> still 0 (the injected `A` hasn't been read yet -- likely
+> because the byte-vs-word arithmetic from TRANSLATION-LOG LC.5
+> still has the workspace pointers in word-address form, so the
+> kernel's FETCH math doesn't index the injected bytes correctly).
+> Documented but not asserted; the next saga step's job is to
+> restore the factor-of-2 arithmetic (probably via an asm
+> multiplication operator) and assert real parser behaviour.
+
+
 > Saga step 7 update (2026-05-15): the initial dictionary chain is
 > in place (33 entries: FORTH, NEXT, HEX, ENTRY, INTEGER, etc.).
 > A new test `dictionary_chain_is_walkable` walks the chain
