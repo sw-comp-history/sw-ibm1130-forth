@@ -1,5 +1,15 @@
 # Runtime status: Moore's 1968 kernel on `sw-ibm1130-emulator`
 
+> Saga step 9 update (2026-05-18): `sw-ibm1130-asm` gained the
+> multiplication operator, and kernel.asm's byte-address
+> arithmetic (`2*WORD`, `2*SECT+74`, etc.) is restored. The
+> inject test now confirms the kernel's `C` cursor advances
+> through injected input (0x1c40 -> 0x1c46 over 5000 steps;
+> 3 characters consumed). TRANSLATION-LOG LC.5 marked RESOLVED.
+> Parser doesn't yet match an injected word against the
+> dictionary (workspace[0] still 0); next saga step's job.
+
+
 > Saga step 8 update (2026-05-18): kernel runs for 1000 steps
 > without a decode error and IAR migrates from the START block
 > into the primitive area (so FORTH_RTN, NEXT, BSI/BSC dispatches

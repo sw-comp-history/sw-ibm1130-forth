@@ -137,19 +137,24 @@ fn inject_a_known_word_observes_parser_behavior() {
     mem.write_word(c2_addr, input_byte_addr.wrapping_add(40));
 
     // Run more steps and observe.
-    let (steps, reason) = step_n(&mut state, &mut mem, 200);
+    let (steps, reason) = step_n(&mut state, &mut mem, 5000);
 
-    // Snapshot the workspace state. (No hard assertion yet -- this
-    // test is exploratory documentation.)
+    // Snapshot the workspace state.
     let workspace_0 = mem.read_word(a_addr); // 'A' slot (current char)
+    let c_value = mem.read_word(c_slot);
     eprintln!(
-        "after injection + 200 steps: IAR={:#x}, ACC={:#x}, XR1={:#x}, XR2={:#x}, XR3={:#x}, A={:#x} -- {reason} (steps={steps})",
-        state.iar, state.acc, state.xr1, state.xr2, state.xr3, workspace_0
+        "after injection + {steps} steps: IAR={:#x}, ACC={:#x}, XR1={:#x}, XR2={:#x}, XR3={:#x}, A={:#x}, C={:#x} -- {reason}",
+        state.iar, state.acc, state.xr1, state.xr2, state.xr3, workspace_0, c_value
     );
 
     // Smoke: kernel must not have crashed.
     assert!(
         reason == "step limit reached" || reason == "halted",
         "expected clean run; got: {reason}"
+    );
+    // C cursor should have advanced past our injection (NEXT bumps it).
+    assert!(
+        c_value >= input_byte_addr,
+        "C cursor should have advanced past input start ({input_byte_addr:#x}); got {c_value:#x}"
     );
 }

@@ -314,7 +314,7 @@ START:  LDX  L 2, STACK_PLUS1 ; XR2 = stack base + 1
         STX  L 3, E1
         MDX  3, 4
         STX  L 3, E
-        LDX  L 3, SECT_BASE   ; was 2*SECT+74
+        LDX  L 3, 2*SECT+74   ; byte address: 2*(word-addr-of-SECT) + 74
         STX  L 3, STACK
         STX  L 3, C2
         LDX  L 3, /B3
@@ -561,11 +561,9 @@ E:      DC      0             ; place to start searches (next-free)
 ;   -3 C  (char pointer),    -2 ACCEPT entry, -1 character table.
 ; We materialise them as labels here in a block that XR1 will
 ; point into.
-W1:     DC      WORD_SYM      ; -6: was 2*WORD (Moore's byte-vs-word
-                              ; arithmetic). STUB: factor-of-2 dropped;
-                              ; runtime tests in step 6 will reveal
-                              ; whether the semantic matters here. See
-                              ; TRANSLATION-LOG.md "MUL operator".
+W1:     DC      2*WORD_SYM    ; -6: byte address of WORD slot (Moore's
+                              ; 2*WORD; restored saga step 9 once the
+                              ; asm gained a multiplication operator).
         DC      0             ; -5 D
         DC      0             ; -4 SAVE
         DC      0             ; -3 C
@@ -591,9 +589,9 @@ R:      DC      0             ; return-stack pointer
 INTST:  BSS     32            ; interpreter state save area
 
 ; Disk-record boundaries
-C1:     DC      0             ; was 2*SECT+642+72; STUB until SECT placement
-C2:     DC      0             ; was character beyond record
-C3:     DC      0             ; was 2*SECT+74
+C1:     DC      2*SECT+714    ; reset-character byte address (was 2*SECT+642+72)
+C2:     DC      0             ; character beyond record; init'd by START
+C3:     DC      2*SECT+74     ; character beyond sector
 
 ERROR:  DC      0
         BSC  L I ERROR, 0     ; B I ERROR (infinite-loop trap)

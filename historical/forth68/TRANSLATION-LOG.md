@@ -105,23 +105,32 @@ stubbed as no-op returns:
 A future "1130 peripheral simulation" saga will provide LIBF
 emission and the device subsystem.
 
-### LC.5: `2*WORD` byte/word arithmetic -> `WORD` direct reference
+### LC.5: `2*WORD` byte/word arithmetic -- RESOLVED (saga step 9)
 
-Moore's source uses `2*WORD` at line 347 to convert a word-address
-into a byte-address for character-pointer arithmetic. Our asm
-does not yet support `*` as a multiplication operator (it is
-reserved for the location-counter sentinel). The `2*` factor is
-dropped in the translation; the symbol `WORD` (renamed
-`WORD_SYM` to avoid clashing with the asm's case-insensitivity)
-is referenced directly.
+Moore's source uses `2*WORD`, `2*SECT+74`, `2*SECT+642+72`,
+`2*PRN+2`, `2*PRN+74` to convert word-addresses into byte-
+addresses for character-pointer arithmetic (FETCH and DEPOSIT
+work in byte-address form, packing two chars per word).
 
-**Runtime semantic:** uncertain. The packed-character-pointer
-math may require the factor of 2. Step 6 runtime tests will
-reveal whether this matters in practice. Same issue applies to
-`2*PRN+2`, `2*SECT+74`, `2*SECT+642+72` -- stubbed similarly
-(the constants C1/C2/C3/DP/DP0/DP1 are initialised to 0 instead
-of the computed expressions). A future asm-extension step could
-add `*` as a multiplication operator.
+**Resolution (step 9):** `sw-ibm1130-asm` gained a multiplication
+operator (Operand::Multiply { lhs, rhs }; the `LHS*RHS` parse
+recognises `*` at any position > 0 as multiplication, leaving
+position-0 `*` as the LC sentinel). With it, `2*WORD_SYM`,
+`2*SECT+74`, etc. parse and resolve correctly.
+
+kernel.asm was updated to use:
+- `W1: DC 2*WORD_SYM` (was `DC WORD_SYM`).
+- `LDX L 3, 2*SECT+74` in START (was `LDX L 3, SECT_BASE`;
+  SECT_BASE renamed back to its arithmetic form).
+- `C1: DC 2*SECT+714` (was `DC 0`; was `2*SECT+642+72` in Moore).
+- `C3: DC 2*SECT+74` (was `DC 0`).
+
+After this, the inject test (`kernel_parses.rs`'s
+`inject_a_known_word_observes_parser_behavior`) shows the
+kernel's `C` cursor advancing through the injected input area
+(0x1c40 -> 0x1c46 across 5000 steps with injection at step 50).
+The factor-of-2 arithmetic is load-bearing for any FORTH parser
+behaviour that involves character I/O.
 
 ### LC.6: `BNP I COM` -> `BSC L COM, 0` (with mask)
 
