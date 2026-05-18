@@ -1,5 +1,14 @@
 # Runtime status: Moore's 1968 kernel on `sw-ibm1130-emulator`
 
+> Saga step 7 update (2026-05-15): the initial dictionary chain is
+> in place (33 entries: FORTH, NEXT, HEX, ENTRY, INTEGER, etc.).
+> A new test `dictionary_chain_is_walkable` walks the chain
+> backwards from `E2` by 4-word entries, finds >= 10 entries, and
+> spot-checks that well-known names (FORTH = 0x0F18, NEXT = 0x170E,
+> HEX = 0x110E, ENTRY = 0x0E17) are present. `listing.fth` is
+> translated (documentation-only until an input source exists).
+
+
 > Saga step 6 deliverable: rolling observation log for what the
 > translated kernel does at runtime, what works, and what hits a
 > stub. Companion to `TRANSLATION-LOG.md`.

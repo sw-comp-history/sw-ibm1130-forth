@@ -210,15 +210,61 @@ of the upstream source is preserved byte-for-byte as a sequence
 of numeric `DC` initialisers. The translation comments retain
 Moore's per-entry character glosses (`; A`, `; B`, etc.).
 
-### LC.15: Initial dictionary entries (lines 519-635 upstream) -- STUB
+### LC.15: Initial dictionary entries (lines 519-635 upstream) -- COMPLETE (saga step 7)
 
 Moore's source includes a large pre-built dictionary at the end
-of the file (the initial set of named primitives). For this
-saga step the dictionary is **stubbed** with a sentinel entry
-(`E2` pointing at a single entry). The full dictionary will be
-re-emitted in a follow-on saga step once we have runtime tests
-confirming the kernel's basic interpreter works. Mechanical work,
-deferred for scope.
+of the file (the initial set of named primitives). The full
+33-entry chain is now translated:
+
+| Slot | Name             | Code address  | Notes |
+| ---- | ---------------- | ------------- | ----- |
+| ...  | (UNDEF catch-all)| UNDEF         | first slot, no name |
+| 1    | FORTH            | FORTH_RTN     | main loop |
+| 2    | RECURSE          | LITER_PLUS1   | name+code+R variable |
+| 3    | FIND             | DO            | dictionary lookup |
+| 4    | ADDRESS          | ADDR_PLUS1    | push variable address |
+| 5    | END              | COM           | end definition |
+| 6    | HEX              | HEX           | hex literal |
+| 7    | OR (-> OR_PRIM)  | OR_PRIM       | bitwise OR; renamed for mnemonic clash (LC.11) |
+| 8    | =                | STORE         | indirect store |
+| 9    | COLON (`:`)      | ENTER         | start definition |
+| 10   | .                | ENTER         | synonym for `:` |
+| 11   | ; (SEMICOLON)    | COM           | end definition |
+| 12   | ,                | COM           | synonym for `;` |
+| 13   | IC               | ADDR_PLUS1    | name+code+IC variable cell |
+| 14   | CENT (cent-sign) | OPER          | machine-code definition |
+| 15   | OPERATION        | OPER          | synonym for cent-sign |
+| 16   | ENTRY            | ENTRY         | dictionary entry mgmt |
+| 17   | INTEGER          | INTEG         | declare integer var |
+| 18   | INC              | INC           | increment counter |
+| 19   | SD               | SD            | stack-to-deposit |
+| 20   | CONVERT          | CONVE         | EBCDIC -> FORTH code |
+| 21   | FETCH            | FETCH         | char fetch |
+| 22   | DEPOSIT          | DEPOS         | char deposit |
+| 23   | PUT              | PUT           | (LIBF stub) |
+| 24   | PRINT            | PRINT         | (LIBF stub) |
+| 25   | NEXT             | NEXT          | word parser |
+| 26   | LOC              | LOC           | look up word address |
+| 27   | E                | LITER_PLUS1   | name+code+E variable |
+| 28   | LIT              | LITER_PLUS1   | literal handler |
+| 29   | E1 (E2 label)    | LITER_PLUS1   | name+code+E1 variable |
+
+The `IC` variable cell now lives inside the dictionary block (at
+the 4th-word slot of the IC entry), per Moore's original layout.
+The previous standalone `IC:` declaration was removed.
+
+### LC.18: FORTH listing translated (`listing.fth`)
+
+`FORTH68lst.txt` translated to `historical/forth68/listing.fth`.
+This is FORTH source (not asm); preserves Moore's `.WORD body ,`
+syntax verbatim (we don't modernise to `: ;`). Status:
+**documentation-only**. The kernel's ACCEPT mechanism reads
+characters via `LIBF DISK1`, which is stubbed; until a future
+saga wires real disk I/O or a memory-buffer input source, the
+listing is not executable. Section dividers added by us for
+navigation; the listing's structure (instruction-template
+builders, control-flow words, character tables, console I/O,
+disk I/O, file system, top-level entry) is annotated.
 
 ### LC.16: `BNP I COM` (return-via-indirect-conditional) -> `BNP L COM`
 

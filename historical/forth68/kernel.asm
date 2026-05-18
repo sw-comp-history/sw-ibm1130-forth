@@ -550,7 +550,10 @@ INTEG:  DC      0
 
 E1:     DC      0             ; top of symbol table (next-free index - 4)
 E:      DC      0             ; place to start searches (next-free)
-IC:     DC      0             ; instruction-counter / current code-emit address
+; IC is the instruction-counter / current code-emit address. In
+; Moore's layout it lives inside the dictionary chain (sits at the
+; fourth-word slot of the 'IC' dict entry below). See the dict
+; block near the bottom of this file.
 
 ; workspace declarations
 ; Moore uses negative offsets from XR1 (= A) to hold:
@@ -748,22 +751,178 @@ BCD_END:
 BUF:    BSS     320           ; sector buffer (320 words)
 
 ; ============================================================
-; SECT and the initial dictionary entries follow Moore's source.
-; STUB: the full dictionary block (lines 519-635 of upstream) is
-; mechanical DC-translation; for this saga step we include a
-; sentinel-only stub. The full table comes in step 6 or later.
+; SECT (sector buffer) + initial dictionary.
+;
+; Each entry is 4 words:
+;   word 0: name-half-1 (packed FORTH internal code)
+;   word 1: name-half-2 (or 2 blanks for short names)
+;   word 2: code address (handler routine)
+;   word 3: blank (or, for variable entries like IC/E/E1, the
+;           storage cell for that variable)
+;
+; The DO routine walks this chain backwards by 4 words at a time
+; (MDX 3, -4); E1 points at the most-recently-added entry and the
+; chain ends when MDX hits a zero entry.
+;
+; Names are encoded in Moore's 6-bit FORTH code: digits 0-9 -> 00..09,
+; A-F -> 0A..0F, G-Z -> 10..22, blank = 0x24, '.' = 0x3A, ';' = 0x30,
+; ',' = 0x34, '=' = 0x3D, etc. Packed two chars per word, big-endian.
+; The byte values below are preserved verbatim from Moore's source.
 ; ============================================================
 
 SECT:   DC      0
 SECT_BASE:
-        BSS     320           ; sector data area
-        DC      0             ; START-of-dictionary marker (Moore had blank)
+        BSS     320           ; sector data area (320 words)
+
+; ---- start of dictionary chain (UNDEF handler is the catch-all) ----
+        DC      0             ; padding
         DC      0
         DC      UNDEF
         DC      0
-E2:     DC      /0E01         ; first valid entry (E1 high-half, padding)
+
+        DC      /0F18         ; FORTH
+        DC      /1B1D
+        DC      FORTH_RTN
+        DC      0
+
+        DC      /1B0E         ; RECURSE
+        DC      /0C1E
+        DC      LITER_PLUS1
+        DC      R
+
+        DC      /0F12         ; FIND
+        DC      /170D
+        DC      DO
+        DC      0
+
+        DC      /0A0D         ; ADDRESS
+        DC      /0D1B
+        DC      ADDR_PLUS1
+        DC      0
+
+        DC      /0E17         ; END
+        DC      /0D24
+        DC      COM
+        DC      0
+
+        DC      /110E         ; HEX
+        DC      /2124
+        DC      HEX
+        DC      0
+
+        DC      /181B         ; OR (renamed OR_PRIM in the translation;
+        DC      /2424         ; see TRANSLATION-LOG LC.11)
+        DC      OR_PRIM
+        DC      0
+
+        DC      /3D24         ; =
+        DC      /2424
+        DC      STORE
+        DC      0
+
+        DC      /3924         ; COLON (':')
+        DC      /2424
+        DC      ENTER
+        DC      0
+
+        DC      /3A24         ; .
+        DC      /2424
+        DC      ENTER
+        DC      0
+
+        DC      /3024         ; SEMICOLON (';')
+        DC      /2424
+        DC      COM
+        DC      0
+
+        DC      /3424         ; ,
+        DC      /2424
+        DC      COM
+        DC      0
+
+        DC      /120C         ; IC
+        DC      /2424
+        DC      ADDR_PLUS1
+IC:     DC      0             ; <-- the IC variable lives in this slot
+
+        DC      /2524         ; cent-sign (defines machine-code primitive)
+        DC      /2424
+        DC      OPER
+        DC      0
+
+        DC      /1819         ; OPERATION (synonym for cent-sign)
+        DC      /0E1B
+        DC      OPER
+        DC      0
+
+        DC      /0E17         ; ENTRY
+        DC      /1D1B
+        DC      ENTRY
+        DC      0
+
+        DC      /1217         ; INTEGER
+        DC      /1D0E
+        DC      INTEG
+        DC      0
+
+        DC      /1217         ; INC (note: name collision in Moore's source
+        DC      /0C24         ; INTEGER and INC have the same hi half; the
+        DC      INC           ; chain walk distinguishes via the lo half)
+        DC      0
+
+        DC      /1C0D         ; SD
+        DC      /2424
+        DC      SD
+        DC      0
+
+        DC      /0C18         ; CONVERT
+        DC      /171F
+        DC      CONVE
+        DC      0
+
+        DC      /0F0E         ; FETCH
+        DC      /1D0C
+        DC      FETCH
+        DC      0
+
+        DC      /0D0E         ; DEPOSIT
+        DC      /1918
+        DC      DEPOS
+        DC      0
+
+        DC      /191E         ; PUT
+        DC      /1D24
+        DC      PUT
+        DC      0
+
+        DC      /191B         ; PRINT
+        DC      /1217
+        DC      PRINT
+        DC      0
+
+        DC      /170E         ; NEXT
+        DC      /211D
+        DC      NEXT
+        DC      0
+
+        DC      /1518         ; LOC
+        DC      /0C24
+        DC      LOC
+        DC      0
+
+        DC      /0E24         ; E
         DC      /2424
         DC      LITER_PLUS1
-        DC      E1
+        DC      E             ; <-- the E variable's address as the value
+
+        DC      /1512         ; LIT
+        DC      /1D24
+        DC      LITER_PLUS1
+        DC      0
+
+E2:     DC      /0E01         ; E1
+        DC      /2424
+        DC      LITER_PLUS1
+        DC      E1            ; <-- the E1 variable's address as the value
 
         END     START

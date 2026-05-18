@@ -86,6 +86,56 @@ fn kernel_does_not_crash_for_first_n_steps() {
 }
 
 #[test]
+fn dictionary_chain_is_walkable() {
+    // After START runs, XR3 is left pointing somewhere; the
+    // dictionary chain begins at E2 (the topmost entry) and walks
+    // backwards by 4 words at a time. Each entry is:
+    //   [name-hi] [name-lo] [code-addr] [blank-or-variable]
+    // The chain terminates when name-hi == 0.
+    //
+    // This test walks the chain by reading memory directly and
+    // checks: (a) we hit a non-trivial number of entries; (b)
+    // a few well-known names (FORTH=/0F18, NEXT=/170E, HEX=/110E)
+    // appear in the chain.
+    let (_state, mem, symbols) = boot();
+    let e2 = symbols.lookup("E2").expect("E2 symbol") as u16;
+    let mut addr = e2;
+    let mut entries = Vec::new();
+    let mut steps = 0;
+    while steps < 200 {
+        let name_hi = mem.read_word(addr);
+        if name_hi == 0 {
+            break;
+        }
+        let name_lo = mem.read_word(addr + 1);
+        let code = mem.read_word(addr + 2);
+        entries.push((name_hi, name_lo, code, addr));
+        // Walk back 4 words.
+        addr = addr.wrapping_sub(4);
+        steps += 1;
+    }
+    assert!(
+        entries.len() >= 10,
+        "expected at least 10 dict entries; found {}",
+        entries.len()
+    );
+    // Spot-check well-known FORTH names by their packed-code values.
+    let names_present: std::collections::HashSet<u16> =
+        entries.iter().map(|(hi, _, _, _)| *hi).collect();
+    for (label, hi) in [
+        ("FORTH", 0x0F18u16),
+        ("NEXT", 0x170E),
+        ("HEX", 0x110E),
+        ("ENTRY", 0x0E17),
+    ] {
+        assert!(
+            names_present.contains(&hi),
+            "expected dict entry for {label} (name-hi = {hi:#06x})"
+        );
+    }
+}
+
+#[test]
 fn kernel_initialises_registers_in_start() {
     // Run far enough to get past START's register-setup block.
     // START loads XR2 with STACK+1, XR1 with A, etc. Verify the
